@@ -14,24 +14,30 @@ public class EmployeeImbursementMgmtDriver {
 
 		MainService mainServ = new MainServiceImpl();
 		
-		Javalin server = Javalin.create();
+		// Initialize Restful server with cors enabled
+		Javalin server = Javalin.create((config) -> config.enableCorsForAllOrigins());
 		server.start(7474);
 		
-		//get all requests by status
+		server.get("/hello", (ctx)->{
+			System.out.println("hello endpoint called....");
+			ctx.result("hello returned from the endpoint");
+		});
+		
+		//get all reimbursements by status
 		server.get("/reimbursements/{status}", ctx -> {
 			List<ReimbursementPojo> reimbursements = mainServ.getAllRequests(ctx.pathParam("status"));
 			ctx.json(reimbursements);
 		});
 		
-		//get all requests for employee
+		//get all reimbursements for employee
 		server.get("/reimbursements/emp/{emp_id}", ctx -> {
-//			int emp_id = Integer.parseInt(ctx.pathParam("emp_id"));
-			int emp_id = ctx.sessionAttribute("emp_id");
+			int emp_id = Integer.parseInt(ctx.pathParam("emp_id"));
+			System.out.println("Jump into main service...");
 			List<ReimbursementPojo> reimbursements = mainServ.getEmployeeRequests(emp_id);
 			ctx.json(reimbursements);
 		});
 		
-		//get all requests for employee by status
+		//get all reimbursements requests for employee by status
 		server.get("/reimbursements/emp/{emp_id}/{status}", ctx -> {
 			int emp_id = Integer.parseInt(ctx.pathParam("emp_id"));
 			String status = ctx.pathParam("status");
@@ -53,15 +59,17 @@ public class EmployeeImbursementMgmtDriver {
 			mainServ.submitRequest(emp_id, amount);
 		});
 		
-		//on login, hold emp_id in session
+		// handle employee  login
 		server.post("/login", ctx -> {
 			String email = ctx.formParam("email");
 			String password = ctx.formParam("password");
+			System.out.println("nooo login..");
 			EmployeePojo user = mainServ.validateLogin(email, password);
 			if (user == null) {
-				ctx.status(400);
+				ctx.result("No match found. Please try again.").status(404);
+				
 			} else {
-				ctx.sessionAttribute("emp_id", user.getEmp_id());
+				ctx.json(user);
 			}
 		});
 		

@@ -13,9 +13,9 @@ public class ReimbursementDaoImpl {
 
 	//@Override
 	public List<ReimbursementPojo> getAllRequests(String status) {
-		try {
+		try(Connection conn = DBUtil.makeConnection();) {
 			List<ReimbursementPojo> reimbursements = new ArrayList<ReimbursementPojo>();
-			Connection conn = DBUtil.makeConnection();
+			
 			Statement stmt = conn.createStatement();
 			String query = "SELECT * FROM reimbursement_details WHERE rb_status = '" + status + "';";
 			ResultSet resultSet = stmt.executeQuery(query);
@@ -35,9 +35,9 @@ public class ReimbursementDaoImpl {
 
 	//@Override
 	public List<ReimbursementPojo> getEmployeeRequests(int emp_id) {
-		try {
+		try(Connection conn = DBUtil.makeConnection();) {
 			List<ReimbursementPojo> reimbursements = new ArrayList<ReimbursementPojo>();
-			Connection conn = DBUtil.makeConnection();
+			
 			Statement stmt = conn.createStatement();
 			String query = "SELECT * FROM reimbursement_details WHERE emp_id = " + emp_id + ";";
 			ResultSet resultSet = stmt.executeQuery(query);

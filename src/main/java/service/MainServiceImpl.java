@@ -11,8 +11,8 @@ import model.ReimbursementPojo;
 
 public class MainServiceImpl implements MainService {
 	
-	EmployeeDao employeeDao;
-	ReimbursementDao reimbursementDao;
+	EmployeeDaoImpl employeeDao;
+	ReimbursementDaoImpl reimbursementDao;
 	
 	public MainServiceImpl() {
 		employeeDao = new EmployeeDaoImpl();

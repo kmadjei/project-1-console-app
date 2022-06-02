@@ -13,32 +13,27 @@ public class EmployeeDaoImpl {
 
 	//@Override
 	public EmployeePojo validateLogin(String email, String password) {
-		try {
-			Connection conn = DBUtil.makeConnection();
+		try(Connection conn = DBUtil.makeConnection();) {
+			
+	
 			Statement stmt = conn.createStatement();
-			String query = "SELECT * FROM employee_details WHERE email = '" + email + "' AND password = crypt('"
-					+ password + "', password);";
+			String query = "SELECT * FROM employee_details WHERE email = '" + email + "' AND password = '"
+					+ password + "'";
 			ResultSet resultSet = stmt.executeQuery(query);
 			
-			if(!resultSet.isBeforeFirst()) {
-				return null;
-			} else {
-				resultSet.next();
+			if(resultSet.next()) {
+				
 				return new EmployeePojo(resultSet.getInt(1), resultSet.getString(2), resultSet.getInt(3), resultSet.getString(4),
 						resultSet.getString(5), resultSet.getString(6));
 			}
-		} catch(SQLException e) {
-			e.printStackTrace();
-//			throw new SystemException();
-			return null;
-		}
-	}
 
-	//@Override
-	public EmployeePojo logout(int emp_id) {
-		// TODO Auto-generated method stub
+		} catch(SQLException e) {
+			e.printStackTrace();		
+		}
+		
 		return null;
 	}
+
 
 	//@Override
 	public EmployeePojo getEmployee(int emp_id) {
@@ -112,6 +107,12 @@ public class EmployeeDaoImpl {
 			e.printStackTrace();
 			return null;
 		}
+	}
+
+
+	public EmployeePojo logout(int emp_id) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

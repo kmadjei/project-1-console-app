@@ -9,20 +9,37 @@ window.onload = function ()
         
         // prevent form submission
         event.preventDefault();
+        console.log();
 
-        const email = document.getElementById("email").value.trim();
-        const password = document.getElementById("password").value.trim();
+        const formData =  document.getElementById("loginForm");
 
-        //const await kk = f
-        
+        // validating credentials through http request
+        try {
+            let response = await fetch('http://127.0.0.1:7474/login', {
+                method: 'POST',
+                body: new FormData(this)
+            });
 
+            if (!response.ok){
+                let msg ="You entered the wrong email or password. Please try again!";
+                document.querySelector(".alert-warning").hidden = false;
+                document.querySelector(".alert").innerText = msg;
+                throw new Error (msg);
+            }
+            console.log(response);
+            let result = await response.json();
+
+            // Store Validated credentials in session storage
+            sessionStorage.setItem("authenticated", JSON.stringify(result));
+
+            window.location.replace("dashboard.html");
+
+        } catch (err) {
+            console.error(err.message);
+        }
     }
 
-    async function handleValidation(email, password) {
-
-        const url = "http://localhost:1234/log"
-    }
-
+  
 }
 
 
