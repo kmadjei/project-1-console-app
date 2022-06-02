@@ -32,6 +32,7 @@ window.onload = function ()
             // Store Validated credentials in session storage
             sessionStorage.setItem("authenticated", JSON.stringify(result));
 
+            // redirect to dashboard page after validating credentials
             window.location.replace("dashboard.html");
 
         } catch (err) {

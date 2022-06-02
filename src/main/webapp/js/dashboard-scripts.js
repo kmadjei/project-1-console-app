@@ -1,15 +1,23 @@
 class Authentication {
-    
+    /*
     constructor() {
-        this.auth = sessionStorage.getItem("authenticated");
-    }
+        console.log("Constructor called")
+        //this.auth = sessionStorage.getItem("authenticated");
+        //this.auth = sessionStorage.getItem("authenticated");
+        this.
+    } */
 
     // checks for authenticated user in sessionStorage
-    checkAuth() {
-        if (this.auth){
+    static checkAuth(auth) {
+        // let auth = sessionStorage.getItem("authenticated");
+        console.log("checkAuth...");
+        let jsonAuth = JSON.parse(auth); // convert to Javascript Obj
+        console.log(jsonAuth.emp_id);
+        if (jsonAuth != null){
+            console.log("auth dash-->")
             // after validating user 
             // get user info from Session
-            return JSON.parse(JSON.stringify(this.auth));
+            return jsonAuth;
         } else {
             // redirect to login  / index
             window.location.replace("/");
@@ -25,15 +33,17 @@ class DashboardEvents {
     
     constructor(employee) {
         this.employee = employee;
-
+        this.buildEmployeeInfoHTML(employee);
+        this.getAllReimbursementRequest(employee)
     }
 
 
 
-    async getAllReimbursementRequest () {
+    async getAllReimbursementRequest (employee) {
         
         try {
-            let response = await fetch(`http://127.0.0.1:7474/reimbursements/emp/${this.employee.emp_id}`);
+            console.log("getAllReimbursementRequest.....");
+            let response = await fetch(`http://127.0.0.1:7474/reimbursements/emp/${employee.emp_id}`);
 
             if(!response.ok) {
                 throw new Error("Sorry! Currently experiencing network issues");
@@ -41,7 +51,7 @@ class DashboardEvents {
 
             // handle data on client side
             let reimbursements = await response.json();
-
+            this.buildRequestHTML(reimbursements);
 
         } catch (err) {
             console.error(err.message);
@@ -51,7 +61,7 @@ class DashboardEvents {
 
     // construct Reimbursement list
     buildRequestHTML(reimbursements ) {
-        
+        console.log("Reimb HTML.....");
         reimbursements.map((item) => {
             let date = new Date(item.rb_timestamp);
             let dateFormat = (date.getDate() +
@@ -87,38 +97,37 @@ class DashboardEvents {
             <div class="dropdown-divider"></div>
             `;
 
+            //update html body for Reimbursements
+            document.getElementById("reimbursements").innerHTML += html;
+
         });
     }
 
     // construct employee Info Card
     buildEmployeeInfoHTML(emp) {
+        console.log("employee HTML");
         let htmlInfo = `
         <div class="d-flex align-items-center justify-content-between">
-            <b>Employee ID </b>
-            <span>---</span>
-            <span>${emp.emp_id}</span>
+            <b>Employee ID</b>
+            <b>${emp.emp_id}</b>
         </div>
         <div class="d-flex align-items-center justify-content-between">
             <b>Job Code</b>
-            <span>---</span>
-            <span>${emp.job_code}</span>
+            <b>${emp.job_code}</b>
         </div>
         <div class="d-flex align-items-center justify-content-between">
             <b>First Name</b>
-            <span>---</span>
-            <span>${emp.fname}</span>
+            <b>${emp.fname}</b>
         </div>
         <div class="d-flex align-items-center justify-content-between">
             <b>Last Name</b>
-            <span>---</span>
-            <span>${emp.lname}</span>
+            <b>${emp.lname}</b>
         </div>
         <div class="d-flex align-items-center justify-content-between">
             <b>Email</b>
-            <span>---</span>
-            <span>${emp.email}</span>
+            <b>${emp.email}</b>
         </div>
-        <button class="btn btn-primary btn-sm float-right">Update</button>
+        <button class="btn btn-primary float-right mt-4">Update</button>
         `;
 
         document.getElementById("employeeInfo").innerHTML = htmlInfo;
@@ -137,10 +146,18 @@ class DashboardEvents {
     }
 }
 
-const auth = new Authentication();
+
 
 // Check for session credentials upon login
-window.onbeforeunload = () => {
+window.onload = () => {
+    console.log("begin");
+    // grab user session object
+    const auth = sessionStorage.getItem("authenticated");
+    console.log("auth ", auth);
+    // validate session object
+    const employee = Authentication.checkAuth(auth);
+    console.log("employee JSON -- ", employee);
 
-    auth.checkAuth();
+    // Initialize dashboard actions
+    const dashboard = new DashboardEvents(employee);
 }
