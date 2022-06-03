@@ -71,8 +71,8 @@ public class ReimbursementDaoImpl {
 
 	//@Override
 	public boolean submitRequest(int emp_id, double amount) {
-		try {
-			Connection conn = DBUtil.makeConnection();
+		try(Connection conn = DBUtil.makeConnection();) {
+			
 			Statement stmt = conn.createStatement();
 			String query = "INSERT INTO reimbursement_details(rb_status, rb_amount, rb_timestamp, emp_id) "
 					+ "VALUES ('pending', " + amount + ", current_timestamp, " + emp_id + ");";

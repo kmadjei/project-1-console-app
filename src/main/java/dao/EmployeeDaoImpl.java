@@ -59,8 +59,8 @@ public class EmployeeDaoImpl {
 
 	//@Override
 	public boolean updateEmployee(int emp_id, int changeColumn, String newInfo) {
-		try {
-			Connection conn = DBUtil.makeConnection();
+		try(Connection conn = DBUtil.makeConnection();) {
+			
 			Statement stmt = conn.createStatement();
 			
 			//fname

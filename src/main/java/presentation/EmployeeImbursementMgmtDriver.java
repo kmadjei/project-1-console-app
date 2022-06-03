@@ -32,7 +32,7 @@ public class EmployeeImbursementMgmtDriver {
 		//get all reimbursements for employee
 		server.get("/reimbursements/emp/{emp_id}", ctx -> {
 			int emp_id = Integer.parseInt(ctx.pathParam("emp_id"));
-			System.out.println("Jump into main service...");
+			System.out.println("/reimbursements/emp/{emp_id}...");
 			List<ReimbursementPojo> reimbursements = mainServ.getEmployeeRequests(emp_id);
 			ctx.json(reimbursements);
 		});
@@ -54,9 +54,17 @@ public class EmployeeImbursementMgmtDriver {
 		
 		//create reimbursement request
 		server.post("/reimbursements", ctx -> {
+			System.out.println("Generate --> /reimbursements/emp/{emp_id}...");
+			// get form parameters
 			int emp_id = Integer.parseInt(ctx.formParam("emp_id"));
 			double amount = Double.parseDouble(ctx.formParam("amount"));
-			mainServ.submitRequest(emp_id, amount);
+			
+			// submit parameters to DB			
+			if(mainServ.submitRequest(emp_id, amount)) {
+				ctx.result("Reimbursement Submitted Successfully!").status(201);
+			} else {
+				ctx.result("Reimbursement request failed to submit!").status(417);
+			}		
 		});
 		
 		// handle employee  login
