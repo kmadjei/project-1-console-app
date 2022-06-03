@@ -45,11 +45,32 @@ public class EmployeeImbursementMgmtDriver {
 			ctx.json(reimbursements);
 		});
 		
-		//update reimbursement request
-		server.put("/reimbursements", ctx -> {
+		//update reimbursement request status
+		server.put("/reimbursements/status/update", ctx -> {
+			System.out.println("Update --> /reimbursements/status/update");
 			int rb_id = Integer.parseInt(ctx.formParam("rb_id"));
 			String rb_status = ctx.formParam("rb_status");
-			mainServ.updateRequest(rb_id, rb_status);
+
+			// submit parameters to DB			
+			if(mainServ.updateRequestStatus(rb_id, rb_status)) {
+				ctx.result("Reimbursement Status Updated Successfully!").status(200);
+			} else {
+				ctx.result("Reimbursement Status Update failed to submit!").status(417);
+			}	
+		});
+		
+		//update reimbursement request details
+		server.put("/reimbursements/details/update", ctx -> {
+			System.out.println("Update --> /reimbursements/details/update");
+			int rb_id = Integer.parseInt(ctx.formParam("rb_id"));
+			double rb_amount = Double.parseDouble(ctx.formParam("amount"));
+					
+			// submit parameters to DB			
+			if(mainServ.updateRequestDetail(rb_id, rb_amount)) {
+				ctx.result("Reimbursement Amount Updated Successfully!").status(200);
+			} else {
+				ctx.result("Reimbursement Amount Update failed to submit!").status(417);
+			}	
 		});
 		
 		//create reimbursement request

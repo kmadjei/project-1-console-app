@@ -50,8 +50,13 @@ public class MainServiceImpl implements MainService {
 	}
 
 	@Override
-	public boolean updateRequest(int rb_id, String newStatus) {
-		return reimbursementDao.updateRequest(rb_id, newStatus);
+	public boolean updateRequestStatus(int rb_id, String newStatus) {
+		return reimbursementDao.updateRequestStatus(rb_id, newStatus);
+	}
+	
+	@Override
+	public boolean updateRequestDetail(int rb_id, double newAmount) {
+		return reimbursementDao.updateRequestDetail(rb_id, newAmount);
 	}
 
 	@Override

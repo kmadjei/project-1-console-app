@@ -56,11 +56,25 @@ public class ReimbursementDaoImpl {
 	}
 
 	//@Override
-	public boolean updateRequest(int rb_id, String newStatus) {
+	public boolean updateRequestStatus(int rb_id, String newStatus) {
 		try {
 			Connection conn = DBUtil.makeConnection();
 			Statement stmt = conn.createStatement();
 			String query = "UPDATE reimbursement_details SET rb_status = '" + newStatus + "' WHERE rb_id = " + rb_id +";";
+			return stmt.executeUpdate(query) == 1;
+			
+		} catch(SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+	
+	//@Override
+	public boolean updateRequestDetail(int rb_id, double newAmount) {
+		try(Connection conn = DBUtil.makeConnection();) {
+			
+			Statement stmt = conn.createStatement();
+			String query = "UPDATE reimbursement_details SET rb_amount = '" + newAmount + "' WHERE rb_id = " + rb_id +";";
 			return stmt.executeUpdate(query) == 1;
 			
 		} catch(SQLException e) {

@@ -11,10 +11,10 @@ public interface MainService {
 	EmployeePojo getEmployee(int emp_id);
 	boolean updateEmployee(int emp_id, int changeColumn, String newInfo);
 	List<EmployeePojo> getAllEmployees();
-	
 	List<ReimbursementPojo> getAllRequests(String status);
 	List<ReimbursementPojo> getEmployeeRequests(int emp_id);
-	boolean updateRequest(int rb_id, String newStatus);
+	boolean updateRequestDetail(int rb_id, double newAmount);
+	boolean updateRequestStatus(int rb_id, String newStatus);
 	boolean submitRequest(int emp_id, double amount);
 	List<ReimbursementPojo> viewMyRequests(int emp_id, String status);
 }

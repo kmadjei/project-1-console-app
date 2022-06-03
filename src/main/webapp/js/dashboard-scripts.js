@@ -34,7 +34,6 @@ class DashboardEvents {
     constructor(employee) {
         this.employee = employee;
         this.buildEmployeeInfoHTML(employee);
-        this.getAllReimbursementRequest(employee)
     }
 
 
@@ -160,4 +159,5 @@ window.onload = () => {
 
     // Initialize dashboard actions
     const dashboard = new DashboardEvents(employee);
+    dashboard.getAllReimbursementRequest(employee);
 }
