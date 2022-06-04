@@ -1,15 +1,14 @@
 class Authentication {
 
     // checks for authenticated user in sessionStorage
-    static checkAuth(auth) {
+    static checkAuth() {
+        
         console.log("checkAuth...");
-        let jsonAuth = JSON.parse(auth); // convert to Javascript Obj
-        console.log(jsonAuth.emp_id);
-        if (jsonAuth != null){
+        if (sessionStorage.getItem("authenticated") != null){
             console.log("auth dash-->")
             // after validating user 
             // get user info from Session
-            return jsonAuth;
+            return JSON.parse(sessionStorage.getItem("authenticated"));
         } else {
             // redirect to login  / index
             window.location.replace("index.html");
@@ -454,14 +453,8 @@ class DashboardEvents {
 // Check for session credentials when page is loaded
 window.onload = () => {
 
-
-    
-    console.log("begin");
-    // grab user session object
-    const auth = sessionStorage.getItem("authenticated");
-    console.log("auth ", auth);
-    // validate session object
-    const employee = Authentication.checkAuth(auth);
+    // Get session user
+    const employee = Authentication.checkAuth();
 
 
     // display search bar to search for an employee

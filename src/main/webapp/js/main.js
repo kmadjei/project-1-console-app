@@ -1,5 +1,5 @@
 function checkAuthentication() {
-    if (sessionStorage("authenticated") != null) {
+    if (sessionStorage.getItem("authenticated") != null) {
         location.replace("dashboard.html");
     } else {
         return false;
