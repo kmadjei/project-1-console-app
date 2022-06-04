@@ -141,10 +141,9 @@ public class EmployeeImbursementMgmtDriver {
 		});
 		
 		//get all employees
-		server.get("employees", ctx -> {
-			List<EmployeePojo> employees = mainServ.getAllEmployees();
-			ctx.json(employees);
-			
+		server.get("/employees", ctx -> {
+			System.out.println("get all --> /Employee...");
+			List<EmployeePojo> employees = mainServ.getAllEmployees();			
 			if(employees != null) {
 				ctx.status(200).json(employees);
 			} else {

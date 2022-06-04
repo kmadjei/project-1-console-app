@@ -84,9 +84,9 @@ public class EmployeeDaoImpl {
 
 	//@Override
 	public List<EmployeePojo> getAllEmployees() {
-		try {
+		try(Connection conn = DBUtil.makeConnection();) {
 			List<EmployeePojo> employees = new ArrayList<EmployeePojo>();
-			Connection conn = DBUtil.makeConnection();
+			
 			Statement stmt = conn.createStatement();
 			String query = "SELECT * FROM employee_details;";
 			ResultSet resultSet = stmt.executeQuery(query);

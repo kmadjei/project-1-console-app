@@ -581,6 +581,63 @@ class DashboardEvents {
           }
     }
 
+    static async getAllEmployees() {
+        console.log("getAllEmployees()...")
+        try {
+            let response = await fetch("http://127.0.0.1:7474/employees");
+            
+            if (!response.ok) {
+                let result = await response.text();
+                throw new Error(result);
+            }
+
+            let result = await response.json();
+
+            let html =`
+            <div class="card-header py-3" >
+            <h5 class="m-0 font-weight-bold text-primary float-left">Employees</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-hover">  
+                    <thead>
+                        <tr>
+                            <th scope="col">ID</th>
+                            <th scope="col">Job Code</th>
+                            <th scope="col">First</th>
+                            <th scope="col">Last</th>
+                            <th scope="col">Email</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            // construct employee table
+           result.map((item) => {
+            
+            html +=`
+                <tr>
+                    <th scope="row">${item.emp_id}</th>
+                    <td>${item.job_code}</td>
+                    <td>${item.fname}</td>
+                    <td>${item.lname}</td>
+                    <td>${item.email}</td>
+                </tr>
+            `;            
+           });
+
+           html +=`
+                        </tbody>
+                    </table
+                </div>
+            </div>
+           `;
+
+           $('#list-wrapper').html(html);
+            
+        } catch (error) {
+            console.error(error.message);
+        }
+    }
 
 }
 
@@ -596,6 +653,7 @@ window.onload = () => {
     // only for manager
     if (employee.job_code == 200) {
         document.querySelector('.navbar-search div.input-group').hidden = false;
+        document.querySelector('#getAllEmployees').hidden = false;
     }
 
 
@@ -627,6 +685,8 @@ window.onload = () => {
 
     // ends user's session
     $('#logOut').click(() => Authentication.logOut());
+
+    $('#getAllEmployees').click(() => DashboardEvents.getAllEmployees());
 
 }
 
