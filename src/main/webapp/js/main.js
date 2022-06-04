@@ -1,3 +1,12 @@
+function checkAuthentication() {
+    if (sessionStorage("authenticated") != null) {
+        location.replace("dashboard.html");
+    } else {
+        return false;
+    }
+}
+
+
 
 window.onload = function () 
 {

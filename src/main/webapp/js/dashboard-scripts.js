@@ -12,12 +12,20 @@ class Authentication {
             return jsonAuth;
         } else {
             // redirect to login  / index
-            window.location.replace("/");
+            window.location.replace("index.html");
         }
         return null;
     }
-}
 
+
+    // Initialize log out process
+    static logOut() {
+        sessionStorage.clear();
+        window.location.replace("index.html");
+    }
+
+
+}
 
 
 
@@ -40,12 +48,66 @@ class DashboardEvents {
 
             // handle data on client side
             let reimbursements = await response.json();
-            this.buildRequestHTML(reimbursements);
+            sessionStorage.setItem("reimbursements", JSON.stringify(reimbursements));
+            this.buildRequestHTML(reimbursements, employee.job_code);
 
         } catch (err) {
             console.error(err.message);
         }
          
+    }
+
+
+
+
+    // Filter through for Reimbursement results
+    getRejectedReimbursements(job_code) {
+        console.log("getRejectedReimbursements().....");
+
+        let reimbursements = JSON.parse(sessionStorage.getItem("reimbursements"))
+                                .filter((item) => {
+                                    if (item.rb_status == "rejected") {
+                                        return item;
+                                    }
+                                });
+        $('#reimbursements').html("");
+        this.buildRequestHTML(reimbursements, job_code);
+    }
+
+    getResolvedReimbursements(job_code) {
+        console.log("getResolvedReimbursements().....");
+
+        let reimbursements = JSON.parse(sessionStorage.getItem("reimbursements"))
+                                .filter((item) => {
+                                    if (item.rb_status == "resolved") {
+                                        return item;
+                                    }
+                                });
+            $('#reimbursements').html("");          
+            this.buildRequestHTML(reimbursements,  job_code);
+    }
+
+
+    getPendingReimbursements(job_code) {
+        console.log("getPendingReimbursements() .....");
+
+        let reimbursements = JSON.parse(sessionStorage.getItem("reimbursements"))
+                                .filter((item) => {
+                                    if (item.rb_status == "pending") {
+                                        return item;
+                                    }
+                                });
+        $('#reimbursements').html("");
+        this.buildRequestHTML(reimbursements, job_code);
+    }
+
+    getAllReq(job_code) {
+        console.log("getAllReq() .....");
+
+        let reimbursements = JSON.parse(sessionStorage.getItem("reimbursements"));
+        console.log(reimbursements)
+        $('#reimbursements').html("");
+        this.buildRequestHTML(reimbursements, job_code);
     }
 
 
@@ -98,8 +160,9 @@ class DashboardEvents {
     }
 
     // construct Reimbursement list
-    buildRequestHTML(reimbursements ) {
-        console.log("Reimb HTML.....");
+    buildRequestHTML(reimbursements, job_code) {
+        console.log("buildRequestHTM().....");
+
         reimbursements.map((item) => {
             let date = new Date(item.rb_timestamp);
             let dateFormat = (date.getDate() +
@@ -123,30 +186,123 @@ class DashboardEvents {
             <div class="mb-4">
                 <h4 class="small font-weight-bold 
                 d-flex align-items-center justify-content-between">
-                    <span class="id">ID: ${item.rb_id}</span>
+                    <span class="rb_id${item.rb_id}">ID: ${item.rb_id}</span>
                     <span class="status ${status}">Status: ${item.rb_status}</span> 
-                    <span class="amount"> ${item.rb_amount}</span>
+                    <span class="amount${item.rb_id}"> ${item.rb_amount}</span>
                 </h4>
-                <div class="d-flex align-items-center justify-content-between">
-                    <h4 class="small font-weight-bold">Date: ${dateFormat}</h4>
-                    <button class="btn btn-primary btn-sm" id="rb_${item.rb_id}" 
-                    onclick=""
-                    >Update</button>
+                `;
+
+
+            // displays for regular employees
+            if (job_code == 100) {
+                html +=`
+                    <div class="d-flex align-items-center justify-content-between">
+                        <h4 class="small font-weight-bold">Date: ${dateFormat}</h4>
+                        <button class="btn btn-primary btn-sm" id="rb_${item.rb_id}" 
+                        onclick="DashboardEvents.updateRequest(event)"
+                        >Update</button>
+                    </div>
                 </div>
-            </div>
-            <div class="dropdown-divider"></div>
-            `;
+                <div class="dropdown-divider"></div>
+                `;
+            } else if (job_code == 200) {
+                //display for managers
+                html +=`
+                    <div class="d-flex align-items-center justify-content-between">
+                        <h4 class="small font-weight-bold">Date: ${dateFormat}</h4>
+                        <button class="btn btn-primary btn-sm" id="rb_${item.rb_id}" 
+                        onclick="DashboardEvents.updateRequest(event)"
+                        >Update</button>
+                    </div>
+                </div>
+                <div class="dropdown-divider"></div>
+                `;
+            }
+                
 
             //update html body for Reimbursements
             document.getElementById("reimbursements").innerHTML += html;
 
         });
 
+    } 
+
+
+    static async updateRequest(event) {
+        console.log("updateRequest()...");
+
+        // get request ID
+        const reqID = event.currentTarget.id.split("_")[1];
+        // get req value
+        const amount = $(`span.amount${reqID}`).val();
+
+          // get user's reimbursement amount 
+          let newAmount = prompt("Please enter the amount to be Reimbursed", amount)
+
+          while(parseFloat(amount) === NaN){
+              newAmount = prompt("Please enter a correct number for your amount ")
+          }
+          const formData = new FormData();
+          formData.append("rb_id", reqID);
+          formData.append("amount", newAmount);
+  
+          try {
+              let response = await fetch('http://127.0.0.1:7474/reimbursements/details/update', {
+              method: 'PUT',
+              body: formData,
+              });
+              let result = await response.text();
+              console.log(result);
+  
+              if (!response.ok){
+  
+                  $('#flashMsg')
+                      .html(                    
+                          `<div class="alert alert-warning" role="alert">
+                              ${result}
+                          </div>`
+                      ).fadeIn(200).fadeOut(4000);
+  
+              } else {
+
+                // get old stored value
+                let oldReq = JSON.parse(sessionStorage.getItem("reimbursements"));
+
+                let newReq = oldReq.map((item) => {
+                    if (item.rb_id == reqID) {
+                        item.rb_amount = newAmount;
+                        return item;
+                    } else {
+                        return item;
+                    }
+                });
+                // store new values
+                sessionStorage.setItem("reimbursements", JSON.stringify(newReq));
+
+                  $('#flashMsg')
+                  .html(                    
+                      `<div class="alert alert-success" role="alert">
+                          ${result}
+                      </div>`
+                  ).fadeIn().fadeOut(4000);
+
+
+                  // update html page
+                  $(`span.amount${reqID}`).text(`${newAmount}`);
+              }
+              
+          } catch (error) {
+              console.log(error.message);
+  
+          }
+  
+
+
     }
 
     // construct employee Info Card
-    buildEmployeeInfoHTML(emp) {
-        console.log("employee HTML");
+    buildEmployeeInfoHTML(emp) {   
+        console.log(" buildEmployeeInfoHTML(emp).....");
         let htmlInfo = `
         <div class="d-flex align-items-center justify-content-between">
             <b>Employee ID</b>
@@ -237,7 +393,6 @@ class DashboardEvents {
     }
 
 
-
     async updateEmployeeInfo(event) {
         console.log("updateEmployeeInfo....")
       
@@ -319,12 +474,21 @@ window.onload = () => {
 
     // Initialize dashboard actions
     const dashboard = new DashboardEvents(employee);
-    dashboard.getAllReimbursementRequest(employee);
+
+    $('#getAllReimbursements').click(() => dashboard.getAllReimbursementRequest(employee));
 
     $('#requestBtn').click(() => dashboard.requestReimbursement(employee.emp_id));
 
-
+    // initialize submit event for editing employee info
     $('#employeeInfoForm').submit(dashboard.updateEmployeeInfo);
+
+    $('#reqAll').click(() => dashboard.getAllReq(employee.job_code));
+    $('#reqRejected').click(() => dashboard.getRejectedReimbursements(employee.job_code));
+    $('#reqResolved').click(() => dashboard.getResolvedReimbursements(employee.job_code));
+    $('#reqPending').click(() => dashboard.getPendingReimbursements(employee.job_code));
+
+    // ends user's session
+    $('#logOut').click(() => Authentication.logOut());
 
 }
 

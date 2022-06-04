@@ -66,26 +66,17 @@
 
             <!-- Nav Item - Pages Collapse Menu -->
             <li class="nav-item">
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo"
-                    aria-expanded="true" aria-controls="collapseTwo">
+                <a class="nav-link" href="#" id="getAllReimbursements" >
                     <i class="fas fa-fw fa-cog"></i>
-                    <span>Components</span>
+                    <span>View All Reimbursements</span>
                 </a>
-                <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded">
-                        <h6 class="collapse-header">Custom Components:</h6>
-                        <a class="collapse-item" href="buttons.html">Buttons</a>
-                        <a class="collapse-item" href="cards.html">Cards</a>
-                    </div>
-                </div>
             </li>
 
             <!-- Nav Item - Utilities Collapse Menu -->
             <li class="nav-item">
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUtilities"
-                    aria-expanded="true" aria-controls="collapseUtilities">
+                <a class="nav-link collapsed" href="#" data-toggle="modal" data-target="#logoutModal">
                     <i class="fas fa-fw fa-wrench"></i>
-                    <span>Utilities</span>
+                    <span>Log Out</span>
                 </a>
                 <div id="collapseUtilities" class="collapse" aria-labelledby="headingUtilities"
                     data-parent="#accordionSidebar">
@@ -251,9 +242,6 @@
 
                     <!-- Flash messages -->
                     <div id="flashMsg" class="col-md-12  d-flex align-items-center justify-content-center my-2">
-                        <div class="alert alert-danger" role="alert">
-                            A simple danger alert—check it out!
-                          </div>
                     </div>
 
 
@@ -271,16 +259,16 @@
                                     <!-- Toggle buttons -->
              
                                     <div class="btn-group btn-group-toggle float-right" data-toggle="buttons">
-                                        <label class="btn btn-primary active btn-sm">
+                                        <label class="btn btn-primary active btn-sm" id="reqAll">
                                           <input type="radio" name="options" id="all" autocomplete="off" checked> All
                                         </label>
-                                        <label class="btn btn-danger btn-sm">
+                                        <label class="btn btn-danger btn-sm" id="reqRejected">
                                           <input type="radio" name="options" id="rejected" autocomplete="off"> Rejected
                                         </label>
-                                        <label class="btn btn-warning btn-sm">
+                                        <label class="btn btn-warning btn-sm" id="reqPending">
                                           <input type="radio" name="options" id="pending" autocomplete="off"> Pending
                                         </label>
-                                        <label class="btn btn-success btn-sm">
+                                        <label class="btn btn-success btn-sm" id="reqResolved">
                                             <input type="radio" name="options" id="resolved" autocomplete="off"> Resolved
                                         </label>
                                     </div>
@@ -353,7 +341,7 @@
                 <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
                 <div class="modal-footer">
                     <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                    <a class="btn btn-primary" href="#">Logout</a>
+                    <a class="btn btn-primary" href="#" id="logOut">Logout</a>
                 </div>
             </div>
         </div>
