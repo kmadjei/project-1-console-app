@@ -82,7 +82,7 @@ public class EmployeeImbursementMgmtDriver {
 			
 			// submit parameters to DB			
 			if(mainServ.submitRequest(emp_id, amount)) {
-				ctx.result("Reimbursement Submitted Successfully!").status(201);
+				ctx.result("Reimbursement submitted Successfully!").status(201);
 			} else {
 				ctx.result("Reimbursement request failed to submit!").status(417);
 			}		
@@ -90,9 +90,10 @@ public class EmployeeImbursementMgmtDriver {
 		
 		// handle employee  login
 		server.post("/login", ctx -> {
+			System.out.println("login..");
 			String email = ctx.formParam("email");
 			String password = ctx.formParam("password");
-			System.out.println("nooo login..");
+			
 			EmployeePojo user = mainServ.validateLogin(email, password);
 			if (user == null) {
 				ctx.result("No match found. Please try again.").status(404);
@@ -113,16 +114,35 @@ public class EmployeeImbursementMgmtDriver {
 			EmployeePojo emp = mainServ.getEmployee(emp_id);
 			ctx.json(emp);
 		});
-		//update employee, should convert to user form and default to old values
-//		server.put("/employees/{emp_id}", ctx -> {
-//			int emp_id = Integer.parseInt(ctx.pathParam("emp_id"));
-//			mainServ
-//		});
-//		
+		
+		//update employee Info
+		server.put("/employees/update", ctx -> {
+			System.out.println("Update Employee...");
+			// get formdata from client side
+			int emp_id = Integer.parseInt(ctx.formParam("empID"));
+			String fname = ctx.formParam("fname");
+			String lname = ctx.formParam("lname"); 
+			String email = ctx.formParam("email");
+			System.out.println(emp_id + " " + lname);
+			EmployeePojo emp = mainServ.updateEmployee(emp_id, fname, lname, email);
+					
+			if(emp != null) {
+				ctx.status(200).json(emp);
+			} else {
+				ctx.result("Employee Information Update Failure.").status(417);
+			}	
+		});
+		
 		//get all employees
 		server.get("employees", ctx -> {
 			List<EmployeePojo> employees = mainServ.getAllEmployees();
 			ctx.json(employees);
+			
+			if(employees != null) {
+				ctx.status(200).json(employees);
+			} else {
+				ctx.result("No reults found.").status(404);
+			}	
 		});
 	}
 

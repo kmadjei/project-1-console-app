@@ -58,35 +58,27 @@ public class EmployeeDaoImpl {
 	}
 
 	//@Override
-	public boolean updateEmployee(int emp_id, int changeColumn, String newInfo) {
+	public EmployeePojo updateEmployee(int emp_id, String fname, String lname, String email) {
 		try(Connection conn = DBUtil.makeConnection();) {
 			
 			Statement stmt = conn.createStatement();
 			
-			//fname
-			if(changeColumn == 1) {
-				String query = "UPDATE employee_details SET fname ='" + newInfo + "' WHERE emp_id =" + emp_id + ";";
-				return stmt.executeUpdate(query) == 1;
-				
-			//lname	
-			} else if(changeColumn == 2) {
-				String query = "UPDATE employee_details SET lname ='" + newInfo + "' WHERE emp_id =" + emp_id + ";";
-				return stmt.executeUpdate(query) == 1;
-			//email
-			} else if(changeColumn == 3) {
-				String query = "UPDATE employee_details SET email ='" + newInfo + "' WHERE emp_id =" + emp_id + ";";
-				return stmt.executeUpdate(query) == 1;
-			//password
-			} else if(changeColumn == 4) {
-				String query = "UPDATE employee_details SET password = crypt('" + newInfo + "', password) WHERE emp_id =" + emp_id + ";";
-				return stmt.executeUpdate(query) == 1;
-			} else {
-				return false;
-			}
+			String query = "UPDATE employee_details SET email ='" + email + "', "
+					+ "fname ='" + fname + "', lname ='" + lname + "' WHERE emp_id =" + emp_id + " RETURNING *;";
+			System.out.println(query);
+			 ResultSet resultSet = stmt.executeQuery(query);
+			 EmployeePojo emp = null; 
+			 
+			 while (resultSet.next()) {
+				 emp = new EmployeePojo(resultSet.getInt(1), resultSet.getString(2), resultSet.getInt(3), resultSet.getString(4),
+							resultSet.getString(5), resultSet.getString(6));
+			 }
+
+			 return emp;
 			
 		} catch(SQLException e) {
 			e.printStackTrace();
-			return false;
+			return null;
 		}
 	}
 
@@ -109,10 +101,5 @@ public class EmployeeDaoImpl {
 		}
 	}
 
-
-	public EmployeePojo logout(int emp_id) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 }

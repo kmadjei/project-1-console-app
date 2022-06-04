@@ -24,10 +24,6 @@ public class MainServiceImpl implements MainService {
 		return employeeDao.validateLogin(email, password);
 	}
 
-	@Override
-	public EmployeePojo logout(int emp_id) {
-		return employeeDao.logout(emp_id);
-	}
 
 	@Override
 	public EmployeePojo getEmployee(int emp_id) {
@@ -35,8 +31,8 @@ public class MainServiceImpl implements MainService {
 	}
 
 	@Override
-	public boolean updateEmployee(int emp_id, int changeColumn, String newInfo) {
-		return employeeDao.updateEmployee(emp_id, changeColumn, newInfo);
+	public EmployeePojo updateEmployee(int emp_id, String fname, String lname, String email) {
+		return employeeDao.updateEmployee(emp_id, fname, lname, email);
 	}
 
 	@Override
