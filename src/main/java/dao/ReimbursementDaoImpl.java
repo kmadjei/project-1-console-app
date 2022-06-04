@@ -9,10 +9,34 @@ import java.util.List;
 
 import model.ReimbursementPojo;
 
-public class ReimbursementDaoImpl {
+public class ReimbursementDaoImpl implements ReimbursementDao{
+	
+	
+	@Override
+	public List<ReimbursementPojo> getAllRequests() {
+		try(Connection conn = DBUtil.makeConnection();) {
+			List<ReimbursementPojo> reimbursements = new ArrayList<ReimbursementPojo>();
+			
+			Statement stmt = conn.createStatement();
+			String query = "SELECT * FROM reimbursement_details;";
+			ResultSet resultSet = stmt.executeQuery(query);
+			
+			while(resultSet.next()) {
+				reimbursements.add(new ReimbursementPojo(resultSet.getInt(1), resultSet.getString(2), resultSet.getDouble(3),
+						resultSet.getTimestamp(4), resultSet.getInt(5)));
+			}
+			
+			return reimbursements;
+			
+		} catch(SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
 
-	//@Override
-	public List<ReimbursementPojo> getAllRequests(String status) {
+	@Override
+	public List<ReimbursementPojo> getAllRequestsByStatus(String status) {
 		try(Connection conn = DBUtil.makeConnection();) {
 			List<ReimbursementPojo> reimbursements = new ArrayList<ReimbursementPojo>();
 			
@@ -33,7 +57,7 @@ public class ReimbursementDaoImpl {
 		}
 	}
 
-	//@Override
+	@Override
 	public List<ReimbursementPojo> getEmployeeRequests(int emp_id) {
 		try(Connection conn = DBUtil.makeConnection();) {
 			List<ReimbursementPojo> reimbursements = new ArrayList<ReimbursementPojo>();
@@ -55,7 +79,7 @@ public class ReimbursementDaoImpl {
 		}
 	}
 
-	//@Override
+	@Override
 	public boolean updateRequestStatus(int rb_id, String newStatus) {
 		try {
 			Connection conn = DBUtil.makeConnection();
@@ -69,7 +93,7 @@ public class ReimbursementDaoImpl {
 		}
 	}
 	
-	//@Override
+	@Override
 	public boolean updateRequestDetail(int rb_id, double newAmount) {
 		try(Connection conn = DBUtil.makeConnection();) {
 			
@@ -83,7 +107,7 @@ public class ReimbursementDaoImpl {
 		}
 	}
 
-	//@Override
+	@Override
 	public boolean submitRequest(int emp_id, double amount) {
 		try(Connection conn = DBUtil.makeConnection();) {
 			
@@ -97,7 +121,7 @@ public class ReimbursementDaoImpl {
 		}
 	}
 
-	//@Override
+	@Override
 	public List<ReimbursementPojo> viewMyRequests(int emp_id, String status) {
 		try {
 			List<ReimbursementPojo> requests = new ArrayList<ReimbursementPojo>();
@@ -116,5 +140,6 @@ public class ReimbursementDaoImpl {
 			return null;
 		}
 	}
+
 
 }

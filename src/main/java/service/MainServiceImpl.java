@@ -34,10 +34,15 @@ public class MainServiceImpl implements MainService {
 	public EmployeePojo updateEmployee(int emp_id, String fname, String lname, String email) {
 		return employeeDao.updateEmployee(emp_id, fname, lname, email);
 	}
+	
+	@Override
+	public List<ReimbursementPojo> getAllRequests() {
+		return reimbursementDao.getAllRequests();
+	}
 
 	@Override
-	public List<ReimbursementPojo> getAllRequests(String status) {
-		return reimbursementDao.getAllRequests(status);
+	public List<ReimbursementPojo> getAllRequestsByStatus(String status) {
+		return reimbursementDao.getAllRequestsByStatus(status);
 	}
 
 	@Override

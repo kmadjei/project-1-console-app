@@ -57,12 +57,10 @@ class DashboardEvents {
     }
 
 
-
-
     // Filter through for Reimbursement results
     getRejectedReimbursements(job_code) {
         console.log("getRejectedReimbursements().....");
-
+        console.log(job_code)
         let reimbursements = JSON.parse(sessionStorage.getItem("reimbursements"))
                                 .filter((item) => {
                                     if (item.rb_status == "rejected") {
@@ -212,6 +210,8 @@ class DashboardEvents {
                         <button class="btn btn-primary btn-sm" id="rb_${item.rb_id}" 
                         onclick="DashboardEvents.updateRequest(event)"
                         >Update</button>
+                        <button type="button" class="btn btn-danger" id="rejected_${item.rb_id}">Reject</button>
+                        <button type="button" class="btn btn-success" id="rejected_${item.rb_id}">Resolve</button>
                     </div>
                 </div>
                 <div class="dropdown-divider"></div>
@@ -445,6 +445,38 @@ class DashboardEvents {
 
     }
 
+    // Methods for Manager --> Employee
+
+    
+    async getAllEmployeeReimbursements (){
+        console.log("getAllEmployeeReimbursements () ....")
+
+        try {
+            console.log("getAllReimbursementRequest.....");
+            let response = await fetch(`http://127.0.0.1:7474/reimbursements`);
+
+            if(!response.ok) {
+                let result = await response.text();
+                $('#flashMsg')
+                .html(                    
+                    `<div class="alert alert-warning" role="alert">
+                        ${result}
+                    </div>`
+                ).fadeIn(200).fadeOut(1000);
+
+                throw new Error("Sorry! Currently experiencing network issues");
+            }
+
+            // handle data on client side
+            let reimbursements = await response.json();
+            sessionStorage.setItem("reimbursements", JSON.stringify(reimbursements));
+            this.buildRequestHTML(reimbursements, 200);
+
+        } catch (err) {
+            console.error(err.message);
+        }
+
+    }
 
 
 }
@@ -463,12 +495,22 @@ window.onload = () => {
         document.querySelector('.navbar-search div.input-group').hidden = false;
     }
 
+
+
     console.log("employee JSON -- ", employee);
 
     // Initialize dashboard actions
     const dashboard = new DashboardEvents(employee);
 
-    $('#getAllReimbursements').click(() => dashboard.getAllReimbursementRequest(employee));
+    $('#getAllReimbursements').click(() => {
+
+        if (employee.job_code == 200) {
+            return dashboard.getAllEmployeeReimbursements();
+        } else if (employee.job_code == 100) { 
+            return dashboard.getAllReimbursementRequest(employee);
+        }
+        
+    });
 
     $('#requestBtn').click(() => dashboard.requestReimbursement(employee.emp_id));
 

@@ -18,14 +18,21 @@ public class EmployeeImbursementMgmtDriver {
 		Javalin server = Javalin.create((config) -> config.enableCorsForAllOrigins());
 		server.start(7474);
 		
-		server.get("/hello", (ctx)->{
-			System.out.println("hello endpoint called....");
-			ctx.result("hello returned from the endpoint");
+		
+		//get all employee reimbursements by status
+		server.get("/reimbursements", ctx -> {
+			List<ReimbursementPojo> reimbursements = mainServ.getAllRequests();
+			
+			if (reimbursements != null) {
+				ctx.json(reimbursements).status(200);
+			} else {
+				ctx.result("No Results Found").status(404);
+			}
 		});
 		
 		//get all reimbursements by status
 		server.get("/reimbursements/{status}", ctx -> {
-			List<ReimbursementPojo> reimbursements = mainServ.getAllRequests(ctx.pathParam("status"));
+			List<ReimbursementPojo> reimbursements = mainServ.getAllRequestsByStatus(ctx.pathParam("status"));
 			ctx.json(reimbursements);
 		});
 		
