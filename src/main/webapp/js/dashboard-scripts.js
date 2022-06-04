@@ -131,21 +131,28 @@ class DashboardEvents {
 
             if (!response.ok){
 
-                $('#flashMsg')
-                    .html(                    
-                        `<div class="alert alert-warning" role="alert">
-                            ${result}
-                        </div>`
-                    ).fadeIn(200).fadeOut(1000);
-
-            } else {
-                $('#flashMsg')
-                .html(                    
+                $('#flashMsg').html(                    
                     `<div class="alert alert-success" role="alert">
                         ${result}
                     </div>`
-                ).fadeIn(200).fadeOut(4000);
+                );
+                $("#flashMsg .alert")                  
+                .animate({
+                  opacity: '0',
+                  height: '0',
+                }, 8000);
 
+            } else {
+                $('#flashMsg').html(                    
+                    `<div class="alert alert-success" role="alert">
+                        ${result}
+                    </div>`
+                );
+                $("#flashMsg .alert")                  
+                .animate({
+                  opacity: '0',
+                  height: '0',
+                }, 8000);
             }
             
         } catch (error) {
@@ -184,7 +191,7 @@ class DashboardEvents {
                 <h4 class="small font-weight-bold 
                 d-flex align-items-center justify-content-between">
                     <span class="rb_id${item.rb_id}">ID: ${item.rb_id}</span>
-                    <span class="status ${status}">Status: ${item.rb_status}</span> 
+                    <span class="status ${status}" id="status${item.rb_id}" >Status: ${item.rb_status}</span> 
                     <span class="amount${item.rb_id}"> ${item.rb_amount}</span>
                 </h4>
                 `;
@@ -207,11 +214,12 @@ class DashboardEvents {
                 html +=`
                     <div class="d-flex align-items-center justify-content-between">
                         <h4 class="small font-weight-bold">Date: ${dateFormat}</h4>
-                        <button class="btn btn-primary btn-sm" id="rb_${item.rb_id}" 
-                        onclick="DashboardEvents.updateRequest(event)"
-                        >Update</button>
-                        <button type="button" class="btn btn-danger" id="rejected_${item.rb_id}">Reject</button>
-                        <button type="button" class="btn btn-success" id="rejected_${item.rb_id}">Resolve</button>
+                        <button type="button" class="btn btn-danger btn-sm" 
+                        onclick="DashboardEvents.updateRequestStatus(event)"
+                        id="rejected_${item.rb_id}">Reject</button>
+                        <button type="button" class="btn btn-success btn-sm" 
+                        onclick="DashboardEvents.updateRequestStatus(event)"
+                        id="resolved_${item.rb_id}">Resolve</button>
                     </div>
                 </div>
                 <div class="dropdown-divider"></div>
@@ -255,12 +263,16 @@ class DashboardEvents {
   
               if (!response.ok){
   
-                  $('#flashMsg')
-                      .html(                    
-                          `<div class="alert alert-warning" role="alert">
-                              ${result}
-                          </div>`
-                      ).fadeIn(200).fadeOut(4000);
+                $('#flashMsg').html(                    
+                    `<div class="alert alert-success" role="alert">
+                        ${result}
+                    </div>`
+                );
+                $("#flashMsg .alert")                  
+                .animate({
+                  opacity: '0',
+                  height: '0',
+                }, 8000);
   
               } else {
 
@@ -278,16 +290,20 @@ class DashboardEvents {
                 // store new values
                 sessionStorage.setItem("reimbursements", JSON.stringify(newReq));
 
-                  $('#flashMsg')
-                  .html(                    
-                      `<div class="alert alert-success" role="alert">
-                          ${result}
-                      </div>`
-                  ).fadeIn().fadeOut(4000);
+                // update html page
+                $(`span.amount${reqID}`).text(`${newAmount}`);
 
-
-                  // update html page
-                  $(`span.amount${reqID}`).text(`${newAmount}`);
+                $('#flashMsg').html(                    
+                    `<div class="alert alert-success" role="alert">
+                        ${result}
+                    </div>`
+                );
+                $("#flashMsg .alert")                  
+                .animate({
+                  opacity: '0',
+                  height: '0',
+                }, 8000);
+     
               }
               
           } catch (error) {
@@ -413,13 +429,17 @@ class DashboardEvents {
 
             if (!response.ok) {
                 let result = await response.text();
-                $('#employeeModal').hide();
-                $('#flashMsg')
-                .html(                    
-                    `<div class="alert alert-warning" role="alert">
+                $('#employeeModal').css("display", "none");
+                $('#flashMsg').html(                    
+                    `<div class="alert alert-success" role="alert">
                         ${result}
                     </div>`
-                ).fadeIn(200).fadeOut(1000);
+                );
+                $("#flashMsg .alert")                  
+                .animate({
+                  opacity: '0',
+                  height: '0',
+                }, 8000);
                 
                 throw new Error(result);
             } else {
@@ -429,14 +449,19 @@ class DashboardEvents {
                 sessionStorage.setItem("authenticated", JSON.stringify(emp));
 
                 // provide user feedback
-                $('#employeeModal').hide();
+                $('#employeeModal').css("display", "none");
                 this.buildEmployeeInfoHTML(emp);
-                $('#flashMsg')
-                .html(                    
+                $('#flashMsg').html(                    
                     `<div class="alert alert-success" role="alert">
-                        Employee Info Updated Successfully.
+                        Update Successful!
                     </div>`
-                ).fadeIn(200).fadeOut(4000);
+                );
+
+                $("#flashMsg .alert")                  
+                .animate({
+                  opacity: '0',
+                  height: '0',
+                }, 8000);
             }
         } catch (error) {
             console.error(error.message);
@@ -457,12 +482,16 @@ class DashboardEvents {
 
             if(!response.ok) {
                 let result = await response.text();
-                $('#flashMsg')
-                .html(                    
-                    `<div class="alert alert-warning" role="alert">
+                $('#flashMsg').html(                    
+                    `<div class="alert alert-success" role="alert">
                         ${result}
                     </div>`
-                ).fadeIn(200).fadeOut(1000);
+                );
+                $("#flashMsg .alert")                  
+                .animate({
+                  opacity: '0',
+                  height: '0',
+                }, 8000);
 
                 throw new Error("Sorry! Currently experiencing network issues");
             }
@@ -476,6 +505,80 @@ class DashboardEvents {
             console.error(err.message);
         }
 
+    }
+
+    static async updateRequestStatus(event) {
+        console.log("updateRequestStatus()...");
+
+        // get selected button details
+        const req = {
+            id: event.currentTarget.id.split("_")[1],
+            status: event.currentTarget.id.split("_")[0]
+        }
+    
+
+          const formData = new FormData();
+          formData.append("rb_id", req.id);
+          formData.append("rb_status", req.status);
+  
+          try {
+              let response = await fetch('http://127.0.0.1:7474/reimbursements/status/update', {
+              method: 'PUT',
+              body: formData,
+              });
+              let result = await response.text();
+              console.log(result);
+  
+              if (!response.ok){
+  
+                $('#flashMsg').html(                    
+                    `<div class="alert alert-success" role="alert">
+                        ${result}
+                    </div>`
+                );
+                $("#flashMsg .alert")                  
+                .animate({
+                  opacity: '0',
+                  height: '0',
+                }, 8000);
+  
+              } else {
+
+                // get old stored session values
+                let oldReq = JSON.parse(sessionStorage.getItem("reimbursements"));
+
+                let newReq = oldReq.map((item) => {
+                    if (item.rb_id == req.id) {
+                        item.rb_status = req.status;
+                        return item;
+                    } else {
+                        return item;
+                    }
+                });
+                // store new values
+                sessionStorage.setItem("reimbursements", JSON.stringify(newReq));
+
+                    // update html page
+                  $(`#reimbursements #status${req.id}`).text(`${req.status}`);
+               
+                  $('#flashMsg').html(                    
+                      `<div class="alert alert-success" role="alert">
+                          ${result}
+                      </div>`
+                  );
+                  $("#flashMsg .alert")                  
+                  .animate({
+                    opacity: '0',
+                    height: '0',
+                  }, 8000);
+
+
+              }
+              
+          } catch (error) {
+              console.log(error.message);
+  
+          }
     }
 
 
