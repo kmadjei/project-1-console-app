@@ -35,11 +35,11 @@ class DashboardEvents {
         this.buildEmployeeInfoHTML(employee);
     }
 
-    async getAllReimbursementRequest (employee) {
+    async getAllReimbursementRequest (emp_id) {
         
         try {
             console.log("getAllReimbursementRequest.....");
-            let response = await fetch(`http://127.0.0.1:7474/reimbursements/emp/${employee.emp_id}`);
+            let response = await fetch(`http://127.0.0.1:7474/reimbursements/emp/${emp_id}`);
 
             if(!response.ok) {
                 throw new Error("Sorry! Currently experiencing network issues");
@@ -48,7 +48,10 @@ class DashboardEvents {
             // handle data on client side
             let reimbursements = await response.json();
             sessionStorage.setItem("reimbursements", JSON.stringify(reimbursements));
-            this.buildRequestHTML(reimbursements, employee.job_code);
+
+            let empJobCode = JSON.parse(sessionStorage.getItem("authenticated")).job_code;
+
+            this.buildRequestHTML(reimbursements, empJobCode);
 
         } catch (err) {
             console.error(err.message);
@@ -471,7 +474,6 @@ class DashboardEvents {
     }
 
     // Methods for Manager --> Employee
-
     
     async getAllEmployeeReimbursements (){
         console.log("getAllEmployeeReimbursements () ....")
@@ -639,6 +641,7 @@ class DashboardEvents {
         }
     }
 
+    
 }
 
 
@@ -668,7 +671,7 @@ window.onload = () => {
         if (employee.job_code == 200) {
             return dashboard.getAllEmployeeReimbursements();
         } else if (employee.job_code == 100) { 
-            return dashboard.getAllReimbursementRequest(employee);
+            return dashboard.getAllReimbursementRequest(employee.emp_id);
         }
         
     });
@@ -687,6 +690,27 @@ window.onload = () => {
     $('#logOut').click(() => Authentication.logOut());
 
     $('#getAllEmployees').click(() => DashboardEvents.getAllEmployees());
+
+    // get search result for specific user/employee
+    $('#searchForm').submit((event) => {
+        console.log("search for specific employee ID")
+        event.preventDefault();
+
+        const emp_id = $('#searchForm input').val().trim();
+        console.log(emp_id)
+
+        // Input validation
+        try {
+            if (emp_id == "") throw "No empty submissions allowed";
+            if (isNaN(emp_id)) throw "Please select an integer for your search";
+        } catch (error) {
+            alert(error);
+            return;
+        }
+
+        dashboard.getAllReimbursementRequest(emp_id)
+
+    });
 
 }
 
