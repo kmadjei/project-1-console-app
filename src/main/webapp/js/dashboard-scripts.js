@@ -111,9 +111,10 @@ class DashboardEvents {
     }
 
 
-    // Generate Reimbursement request
+    // Generate new Reimbursement request
     async requestReimbursement(emp_id) {
-            
+        console.log("requestReimbursement(emp_id)...");
+    
         // get user's reimbursement amount 
         let amount = prompt("Please enter the amount to be Reimbursed", 22.50)
 
